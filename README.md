@@ -1,4 +1,4 @@
-# LocalSend
+# QUickDrop Edit from LocalSend
 
 [![CI status][ci-badge]][ci-workflow]
 [![Translations][translate-badge]][translate-link]

@@ -1,13 +1,14 @@
 import 'dart:async';
-
 import 'package:common/model/device.dart';
 import 'package:common/model/session_status.dart';
 import 'package:flutter/material.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
+import 'package:localsend_app/pages/receive_page_controller.dart';
 import 'package:localsend_app/provider/device_info_provider.dart';
 import 'package:localsend_app/provider/favorites_provider.dart';
 import 'package:localsend_app/provider/network/send_provider.dart';
+import 'package:localsend_app/service/log_service.dart';
 import 'package:localsend_app/util/favorites.dart';
 import 'package:localsend_app/util/native/taskbar_helper.dart';
 import 'package:localsend_app/widget/animations/initial_fade_transition.dart';
@@ -44,19 +45,63 @@ class _SendPageState extends State<SendPage> with Refena {
   }
 
   void _cancel() {
-    // the state will be lost so we store them temporarily (only for UI)
     final myDevice = ref.read(deviceFullInfoProvider);
     final sendState = ref.read(sendProvider)[widget.sessionId];
-    if (sendState == null) {
-      return;
-    }
+    if (sendState == null) return;
 
     setState(() {
       _myDevice = myDevice;
       _targetDevice = sendState.target;
     });
+
     ref.notifier(sendProvider).cancelSession(widget.sessionId);
   }
+
+  /// 📌 **ฟังก์ชันบันทึก Log ไปยัง Web Server**
+  Future<void> _sendTransferLog() async {
+  final sendState = ref.read(sendProvider)[widget.sessionId];
+  if (sendState == null) return;
+
+  final myDevice = ref.read(deviceFullInfoProvider);
+  final targetDevice = sendState.target;
+  final logService = ref.read(logServiceProvider); // ใช้ provider แทนการสร้างอินสแตนซ์ใหม่
+  
+
+  for (final entry in sendState.files.entries) {
+    final file = entry.value;
+    
+    final fileExtension = file.file.fileName.contains('.')
+        ? file.file.fileName.substring(file.file.fileName.lastIndexOf('.') + 1).toLowerCase()
+        : 'unknown';
+
+    final logEntry = TransferLogEntry(
+      senderName: myDevice.alias,
+      senderIp: myDevice.ip,
+      receiverName: targetDevice.alias,
+      receiverIp: targetDevice.ip,
+      fileName: file.file.fileName,
+      fileSize: file.file.size,
+      fileType: fileExtension, // ใช้ extension แทน
+      timestamp: DateTime.now(),
+      successful: sendState.status == SessionStatus.finished,
+    );
+
+    try {
+      // ส่ง Log ไปยัง Server ผ่าน HTTP API
+      final success = await logService.sendTransferLog(logEntry);
+      
+      if (success) {
+        // ส่ง Log ไปยัง WebSocket เพื่อให้ได้ real-time update
+        
+        debugPrint('📦 Log การส่งไฟล์ถูกส่งไปยังเซิร์ฟเวอร์: ${file.file.fileName}');
+      } else {
+        debugPrint('⚠️ ไม่สามารถส่ง Log ไปยังเซิร์ฟเวอร์: ${file.file.fileName}');
+      }
+    } catch (e) {
+      debugPrint('❌ เกิดข้อผิดพลาดในการส่ง Log: $e');
+    }
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +113,11 @@ class _SendPageState extends State<SendPage> with Refena {
         TaskbarHelper.visualizeStatus(nextStatus);
       }
     });
+
     if (sendState == null && _myDevice == null && _targetDevice == null) {
-      return Scaffold(
-        body: Container(),
-      );
+      return Scaffold(body: Container());
     }
+
     final myDevice = ref.watch(deviceFullInfoProvider);
     final targetDevice = sendState?.target ?? _targetDevice!;
     final targetFavoriteEntry = ref.watch(favoritesProvider.select((state) => state.findDevice(targetDevice)));
@@ -101,9 +146,7 @@ class _SendPageState extends State<SendPage> with Refena {
                           InitialSlideTransition(
                             origin: const Offset(0, -1),
                             duration: const Duration(milliseconds: 400),
-                            child: DeviceListTile(
-                              device: myDevice,
-                            ),
+                            child: DeviceListTile(device: myDevice),
                           ),
                           const SizedBox(height: 20),
                           const InitialFadeTransition(
@@ -122,66 +165,32 @@ class _SendPageState extends State<SendPage> with Refena {
                         ],
                       ),
                     ),
+
+                    /// ✅ **อัปเดต UI ให้แสดงผลเมื่อส่งไฟล์สำเร็จ**
                     if (sendState != null)
                       InitialFadeTransition(
                         duration: const Duration(milliseconds: 300),
                         delay: const Duration(milliseconds: 400),
                         child: Column(
                           children: [
-                            switch (sendState.status) {
-                              SessionStatus.waiting => Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Text(t.sendPage.waiting, textAlign: TextAlign.center),
+                            if (sendState.status == SessionStatus.finished)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Text(
+                                  '✅ ไฟล์ถูกส่งสำเร็จ!',
+                                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                                  textAlign: TextAlign.center,
                                 ),
-                              SessionStatus.declined => Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Text(
-                                    t.sendPage.rejected,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.warning),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              SessionStatus.tooManyAttempts => Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Text(
-                                    t.sendPage.tooManyAttempts,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.warning),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              SessionStatus.recipientBusy => Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Text(
-                                    t.sendPage.busy,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.warning),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              SessionStatus.finishedWithErrors => Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(t.general.error, style: TextStyle(color: Theme.of(context).colorScheme.warning)),
-                                      if (sendState.errorMessage != null)
-                                        TextButton(
-                                          style: TextButton.styleFrom(
-                                            foregroundColor: Theme.of(context).colorScheme.warning,
-                                          ),
-                                          onPressed: () async => showDialog(
-                                            context: context,
-                                            builder: (_) => ErrorDialog(error: sendState.errorMessage!),
-                                          ),
-                                          child: const Icon(Icons.info),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              _ => const SizedBox(),
-                            },
+                              ),
+
+                            /// 📌 **เรียก `_sendTransferLog()` ก่อนปิดหน้า**
                             Center(
                               child: FilledButton.icon(
-                                onPressed: () {
+                                onPressed: () async {
+                                  if (sendState?.status == SessionStatus.finished) {
+                                    await _sendTransferLog(); // ✅ บันทึก Log
+                                  }
+                                  if (!mounted) return; // ✅ ป้องกัน BuildContext error
                                   _cancel();
                                   context.pop();
                                 },

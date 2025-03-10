@@ -7,6 +7,7 @@ import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/persistence/color_mode.dart';
 import 'package:localsend_app/pages/home_page.dart';
+import 'package:localsend_app/pages/receive_page_controller.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
 import 'package:localsend_app/util/ui/dynamic_colors.dart';
@@ -45,6 +46,7 @@ class LocalSendApp extends StatelessWidget {
     final ref = context.ref;
     final (themeMode, colorMode) = ref.watch(settingsProvider.select((settings) => (settings.theme, settings.colorMode)));
     final dynamicColors = ref.watch(dynamicColorsProvider);
+    
     return TrayWatcher(
       child: WindowWatcher(
         child: LifeCycleWatcher(
@@ -52,10 +54,12 @@ class LocalSendApp extends StatelessWidget {
             switch (state) {
               case AppLifecycleState.resumed:
                 ref.redux(localIpProvider).dispatch(InitLocalIpAction());
+                // 🔴 ลบ WebSocket ออก
+                break;
+              case AppLifecycleState.inactive:
+              case AppLifecycleState.paused:
                 break;
               case AppLifecycleState.detached:
-                // The main isolate is only exited when all child isolates are exited.
-                // https://github.com/localsend/localsend/issues/1568
                 ref.redux(parentIsolateProvider).dispatch(IsolateDisposeAction());
                 break;
               default:
@@ -74,10 +78,12 @@ class LocalSendApp extends StatelessWidget {
               themeMode: colorMode == ColorMode.oled ? ThemeMode.dark : themeMode,
               navigatorKey: Routerino.navigatorKey,
               home: RouterinoHome(
-                builder: () => const HomePage(
-                  initialTab: HomeTab.receive,
-                  appStart: true,
-                ),
+                builder: () {
+                  return const HomePage(
+                    initialTab: HomeTab.receive,
+                    appStart: true,
+                  );
+                },
               ),
             ),
           ),

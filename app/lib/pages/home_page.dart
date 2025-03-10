@@ -16,8 +16,8 @@ import 'package:refena_flutter/refena_flutter.dart';
 
 enum HomeTab {
   receive(Icons.wifi),
-  send(Icons.send),
-  settings(Icons.settings);
+  send(Icons.send);
+  // settings(Icons.settings);
 
   const HomeTab(this.icon);
 
@@ -29,8 +29,8 @@ enum HomeTab {
         return t.receiveTab.title;
       case HomeTab.send:
         return t.sendTab.title;
-      case HomeTab.settings:
-        return t.settingsTab.title;
+      // case HomeTab.settings:
+      //   return t.settingsTab.title;
     }
   }
 }

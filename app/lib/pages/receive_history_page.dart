@@ -22,15 +22,15 @@ import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
 
 enum _EntryOption {
-  open,
-  showInFolder,
+  // open,
+  // showInFolder,
   info,
   delete;
 
   String get label {
     return switch (this) {
-      _EntryOption.open => t.receiveHistoryPage.entryActions.open,
-      _EntryOption.showInFolder => t.receiveHistoryPage.entryActions.showInFolder,
+      // _EntryOption.open => t.receiveHistoryPage.entryActions.open,
+      // _EntryOption.showInFolder => t.receiveHistoryPage.entryActions.showInFolder,
       _EntryOption.info => t.receiveHistoryPage.entryActions.info,
       _EntryOption.delete => t.receiveHistoryPage.entryActions.deleteFromHistory,
     };
@@ -74,21 +74,21 @@ class ReceiveHistoryPage extends StatelessWidget {
             child: Row(
               children: [
                 const SizedBox(width: 15),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondaryContainerIfDark,
-                    foregroundColor: Theme.of(context).colorScheme.onSecondaryContainerIfDark,
-                  ),
-                  onPressed: checkPlatform([TargetPlatform.iOS])
-                      ? null
-                      : () async {
-                          // ignore: use_build_context_synchronously
-                          final destination = context.read(settingsProvider).destination ?? await getDefaultDestinationDirectory();
-                          await openFolder(folderPath: destination);
-                        },
-                  icon: const Icon(Icons.folder),
-                  label: Text(t.receiveHistoryPage.openFolder),
-                ),
+                // ElevatedButton.icon(
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Theme.of(context).colorScheme.secondaryContainerIfDark,
+                //     foregroundColor: Theme.of(context).colorScheme.onSecondaryContainerIfDark,
+                //   ),
+                //   onPressed: checkPlatform([TargetPlatform.iOS])
+                //       ? null
+                //       : () async {
+                //           // ignore: use_build_context_synchronously
+                //           final destination = context.read(settingsProvider).destination ?? await getDefaultDestinationDirectory();
+                //           await openFolder(folderPath: destination);
+                //         },
+                //   icon: const Icon(Icons.folder),
+                //   label: Text(t.receiveHistoryPage.openFolder),
+                // ),
                 const SizedBox(width: 20),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -174,17 +174,17 @@ class ReceiveHistoryPage extends StatelessWidget {
                       PopupMenuButton<_EntryOption>(
                         onSelected: (_EntryOption item) async {
                           switch (item) {
-                            case _EntryOption.open:
-                              await _openFile(context, entry, context.redux(receiveHistoryProvider));
-                              break;
-                            case _EntryOption.showInFolder:
-                              if (entry.path != null) {
-                                await openFolder(
-                                  folderPath: File(entry.path!).parent.path,
-                                  fileName: path.basename(entry.path!),
-                                );
-                              }
-                              break;
+                            // case _EntryOption.open:
+                            //   await _openFile(context, entry, context.redux(receiveHistoryProvider));
+                            //   break;
+                            // case _EntryOption.showInFolder:
+                            //   if (entry.path != null) {
+                            //     await openFolder(
+                            //       folderPath: File(entry.path!).parent.path,
+                            //       fileName: path.basename(entry.path!),
+                            //     );
+                            //   }
+                            //   break;
                             case _EntryOption.info:
                               // ignore: use_build_context_synchronously
                               await showDialog(

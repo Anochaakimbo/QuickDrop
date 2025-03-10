@@ -189,9 +189,9 @@ class SendTab extends StatelessWidget {
                     child: const Icon(Icons.favorite),
                   ),
                 ),
-                _SendModeButton(
-                  onSelect: (mode) async => vm.onTapSendMode(context, mode),
-                ),
+                // _SendModeButton(
+                //   onSelect: (mode) async => vm.onTapSendMode(context, mode),
+                // ),
               ],
             ),
             if (vm.nearbyDevices.isEmpty)
@@ -208,14 +208,15 @@ class SendTab extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 10, left: _horizontalPadding, right: _horizontalPadding),
                 child: Hero(
                   tag: 'device-${device.ip}',
-                  child: vm.sendMode == SendMode.multiple
-                      ? _MultiSendDeviceListTile(
-                          device: device,
-                          isFavorite: favoriteEntry != null,
-                          nameOverride: favoriteEntry?.alias,
-                          vm: vm,
-                        )
-                      : DeviceListTile(
+                  child: 
+                  // vm.sendMode == SendMode.multiple
+                  //     ? _MultiSendDeviceListTile(
+                  //         device: device,
+                  //         isFavorite: favoriteEntry != null,
+                  //         nameOverride: favoriteEntry?.alias,
+                  //         vm: vm,
+                  //       )
+                      DeviceListTile(
                           device: device,
                           isFavorite: favoriteEntry != null,
                           nameOverride: favoriteEntry?.alias,
@@ -388,157 +389,157 @@ class _RotatingSyncIcon extends StatelessWidget {
   }
 }
 
-class _SendModeButton extends StatelessWidget {
-  final void Function(SendMode mode) onSelect;
+// class _SendModeButton extends StatelessWidget {
+//   final void Function(SendMode mode) onSelect;
 
-  const _SendModeButton({required this.onSelect});
+//   const _SendModeButton({required this.onSelect});
 
-  @override
-  Widget build(BuildContext context) {
-    return _CircularPopupButton<int>(
-      tooltip: t.sendTab.sendMode,
-      onSelected: (mode) async {
-        switch (mode) {
-          case 0:
-            onSelect(SendMode.single);
-            break;
-          case 1:
-            onSelect(SendMode.multiple);
-            break;
-          case 2:
-            onSelect(SendMode.link);
-            break;
-          case -1:
-            await showDialog(context: context, builder: (_) => const SendModeHelpDialog());
-            break;
-        }
-      },
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: 0,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Consumer(
-                builder: (context, ref) {
-                  final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
-                  return Visibility(
-                    visible: sendMode == SendMode.single,
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                    child: const Icon(Icons.check_circle),
-                  );
-                },
-              ),
-              const SizedBox(width: 10),
-              Text(t.sendTab.sendModes.single),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 1,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Consumer(
-                builder: (context, ref) {
-                  final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
-                  return Visibility(
-                    visible: sendMode == SendMode.multiple,
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                    child: const Icon(Icons.check_circle),
-                  );
-                },
-              ),
-              const SizedBox(width: 10),
-              Text(t.sendTab.sendModes.multiple),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 2,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Visibility(
-                visible: false,
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                child: Icon(Icons.check_circle),
-              ),
-              const SizedBox(width: 10),
-              Text(t.sendTab.sendModes.link),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
-        PopupMenuItem(
-          value: -1,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Directionality(
-                textDirection: TextDirection.ltr,
-                child: Icon(Icons.help),
-              ),
-              const SizedBox(width: 10),
-              Text(t.sendTab.sendModeHelp),
-            ],
-          ),
-        ),
-      ],
-      child: const Padding(
-        padding: EdgeInsets.all(8),
-        child: Icon(Icons.settings),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return _CircularPopupButton<int>(
+//       tooltip: t.sendTab.sendMode,
+//       onSelected: (mode) async {
+//         switch (mode) {
+//           case 0:
+//             onSelect(SendMode.single);
+//             break;
+//           case 1:
+//             onSelect(SendMode.multiple);
+//             break;
+//           case 2:
+//             onSelect(SendMode.link);
+//             break;
+//           case -1:
+//             await showDialog(context: context, builder: (_) => const SendModeHelpDialog());
+//             break;
+//         }
+//       },
+//       itemBuilder: (_) => [
+//         PopupMenuItem(
+//           value: 0,
+//           child: Row(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Consumer(
+//                 builder: (context, ref) {
+//                   final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
+//                   return Visibility(
+//                     visible: sendMode == SendMode.single,
+//                     maintainSize: true,
+//                     maintainAnimation: true,
+//                     maintainState: true,
+//                     child: const Icon(Icons.check_circle),
+//                   );
+//                 },
+//               ),
+//               const SizedBox(width: 10),
+//               Text(t.sendTab.sendModes.single),
+//             ],
+//           ),
+//         ),
+//         PopupMenuItem(
+//           value: 1,
+//           child: Row(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Consumer(
+//                 builder: (context, ref) {
+//                   final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
+//                   return Visibility(
+//                     visible: sendMode == SendMode.multiple,
+//                     maintainSize: true,
+//                     maintainAnimation: true,
+//                     maintainState: true,
+//                     child: const Icon(Icons.check_circle),
+//                   );
+//                 },
+//               ),
+//               const SizedBox(width: 10),
+//               Text(t.sendTab.sendModes.multiple),
+//             ],
+//           ),
+//         ),
+//         PopupMenuItem(
+//           value: 2,
+//           child: Row(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               const Visibility(
+//                 visible: false,
+//                 maintainSize: true,
+//                 maintainAnimation: true,
+//                 maintainState: true,
+//                 child: Icon(Icons.check_circle),
+//               ),
+//               const SizedBox(width: 10),
+//               Text(t.sendTab.sendModes.link),
+//             ],
+//           ),
+//         ),
+//         const PopupMenuDivider(),
+//         PopupMenuItem(
+//           value: -1,
+//           child: Row(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               const Directionality(
+//                 textDirection: TextDirection.ltr,
+//                 child: Icon(Icons.help),
+//               ),
+//               const SizedBox(width: 10),
+//               Text(t.sendTab.sendModeHelp),
+//             ],
+//           ),
+//         ),
+//       ],
+//       child: const Padding(
+//         padding: EdgeInsets.all(8),
+//         child: Icon(Icons.settings),
+//       ),
+//     );
+//   }
+// }
 
 /// An advanced list tile which shows the progress of the file transfer.
-class _MultiSendDeviceListTile extends StatelessWidget {
-  final Device device;
-  final bool isFavorite;
-  final String? nameOverride;
-  final SendTabVm vm;
+// class _MultiSendDeviceListTile extends StatelessWidget {
+//   final Device device;
+//   final bool isFavorite;
+//   final String? nameOverride;
+//   final SendTabVm vm;
 
-  const _MultiSendDeviceListTile({
-    required this.device,
-    required this.isFavorite,
-    required this.nameOverride,
-    required this.vm,
-  });
+//   const _MultiSendDeviceListTile({
+//     required this.device,
+//     required this.isFavorite,
+//     required this.nameOverride,
+//     required this.vm,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    final ref = context.ref;
-    final session = ref.watch(sendProvider).values.firstWhereOrNull((s) => s.target.ip == device.ip);
-    final double? progress;
-    if (session != null) {
-      final files = session.files.values.where((f) => f.token != null);
-      final progressNotifier = ref.watch(progressProvider);
-      final currBytes = files.fold<int>(
-          0, (prev, curr) => prev + ((progressNotifier.getProgress(sessionId: session.sessionId, fileId: curr.file.id) * curr.file.size).round()));
-      final totalBytes = files.fold<int>(0, (prev, curr) => prev + curr.file.size);
-      progress = totalBytes == 0 ? 0 : currBytes / totalBytes;
-    } else {
-      progress = null;
-    }
-    return DeviceListTile(
-      device: device,
-      info: session?.status.humanString,
-      progress: progress,
-      isFavorite: isFavorite,
-      nameOverride: nameOverride,
-      onFavoriteTap: () async => await vm.onToggleFavorite(context, device),
-      onTap: () async => await vm.onTapDeviceMultiSend(context, device),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final ref = context.ref;
+//     final session = ref.watch(sendProvider).values.firstWhereOrNull((s) => s.target.ip == device.ip);
+//     final double? progress;
+//     if (session != null) {
+//       final files = session.files.values.where((f) => f.token != null);
+//       final progressNotifier = ref.watch(progressProvider);
+//       final currBytes = files.fold<int>(
+//           0, (prev, curr) => prev + ((progressNotifier.getProgress(sessionId: session.sessionId, fileId: curr.file.id) * curr.file.size).round()));
+//       final totalBytes = files.fold<int>(0, (prev, curr) => prev + curr.file.size);
+//       progress = totalBytes == 0 ? 0 : currBytes / totalBytes;
+//     } else {
+//       progress = null;
+//     }
+//     return DeviceListTile(
+//       device: device,
+//       info: session?.status.humanString,
+//       progress: progress,
+//       isFavorite: isFavorite,
+//       nameOverride: nameOverride,
+//       onFavoriteTap: () async => await vm.onToggleFavorite(context, device),
+//       onTap: () async => await vm.onTapDeviceMultiSend(context, device),
+//     );
+//   }
+// }
 
 extension on SessionStatus {
   String? get humanString {

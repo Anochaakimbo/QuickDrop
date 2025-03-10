@@ -25,27 +25,27 @@ import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
 
 class SendTabVm {
-  final SendMode sendMode;
+  // final SendMode sendMode;
   final List<CrossFile> selectedFiles;
   final List<String> localIps;
   final Iterable<Device> nearbyDevices;
   final List<FavoriteDevice> favoriteDevices;
   final Future<void> Function(BuildContext context) onTapAddress;
   final Future<void> Function(BuildContext context) onTapFavorite;
-  final Future<void> Function(BuildContext context, SendMode mode) onTapSendMode;
+  // final Future<void> Function(BuildContext context, SendMode mode) onTapSendMode;
   final Future<void> Function(BuildContext context, Device device) onToggleFavorite;
   final Future<void> Function(BuildContext context, Device device) onTapDevice;
   final Future<void> Function(BuildContext context, Device device) onTapDeviceMultiSend;
 
   const SendTabVm({
-    required this.sendMode,
+    // required this.sendMode,
     required this.selectedFiles,
     required this.localIps,
     required this.nearbyDevices,
     required this.favoriteDevices,
     required this.onTapAddress,
     required this.onTapFavorite,
-    required this.onTapSendMode,
+    // required this.onTapSendMode,
     required this.onToggleFavorite,
     required this.onTapDevice,
     required this.onTapDeviceMultiSend,
@@ -53,14 +53,14 @@ class SendTabVm {
 }
 
 final sendTabVmProvider = ViewProvider((ref) {
-  final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
+  // final sendMode = ref.watch(settingsProvider.select((s) => s.sendMode));
   final selectedFiles = ref.watch(selectedSendingFilesProvider);
   final localIps = ref.watch(localIpProvider).localIps;
   final nearbyDevices = ref.watch(nearbyDevicesProvider).devices.values;
   final favoriteDevices = ref.watch(favoritesProvider);
 
   return SendTabVm(
-    sendMode: sendMode,
+    // sendMode: sendMode,
     selectedFiles: selectedFiles,
     localIps: localIps,
     nearbyDevices: nearbyDevices,
@@ -102,22 +102,22 @@ final sendTabVmProvider = ViewProvider((ref) {
             );
       }
     },
-    onTapSendMode: (context, mode) async {
-      if (mode == SendMode.link) {
-        final files = ref.read(selectedSendingFilesProvider);
-        if (files.isEmpty) {
-          await context.pushBottomSheet(() => const NoFilesDialog());
-          return;
-        }
-        await context.push(() => WebSendPage(files));
-        return;
-      }
+    // onTapSendMode: (context, mode) async {
+    //   if (mode == SendMode.link) {
+    //     final files = ref.read(selectedSendingFilesProvider);
+    //     if (files.isEmpty) {
+    //       await context.pushBottomSheet(() => const NoFilesDialog());
+    //       return;
+    //     }
+    //     await context.push(() => WebSendPage(files));
+    //     return;
+    //   }
 
-      await ref.notifier(settingsProvider).setSendMode(mode);
-      if (mode != SendMode.multiple) {
-        ref.notifier(sendProvider).clearAllSessions();
-      }
-    },
+    //   await ref.notifier(settingsProvider).setSendMode(mode);
+    //   if (mode != SendMode.multiple) {
+    //     ref.notifier(sendProvider).clearAllSessions();
+    //   }
+    // },
     onToggleFavorite: (context, device) async {
       final favoriteDevice = favoriteDevices.findDevice(device);
       if (favoriteDevice != null) {
